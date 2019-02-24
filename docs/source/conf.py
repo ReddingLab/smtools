@@ -20,6 +20,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../smtools/'))
+sys.path.append('/Users/syentist/Documents/git/smtools/smtools')
 
 # -- General configuration ------------------------------------------------
 
