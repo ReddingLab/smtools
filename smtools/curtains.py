@@ -18,7 +18,7 @@ __version__ = '0.2.0'
 __author__ = 'Sy Redding'
 
 ########################################################################
-from smtools.misc import super_gauss_function,mundane_gauss_function
+from smtools.misc import super_gauss_function, mundane_gauss_function
 from skimage.feature import canny
 from skimage.transform import probabilistic_hough_line
 from skimage.exposure import equalize_adapthist
