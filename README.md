@@ -14,8 +14,8 @@ tree for the Redding Lab smtools project
         ├── misc.py
         └── testdata
         
-Documentation: https://reddinglab-smtools.readthedocs.io/en/latest/
+Documentation: https://smtools.readthedocs.io/en/latest/
 
-![](https://github.com/ReddingLab/toolbox/blob/master/images/alignment.png)
+![](https://github.com/ReddingLab/smtools/blob/master/images/alignment.png)
 
-![](https://github.com/ReddingLab/toolbox/blob/master/images/curtain_finder.png)
+![](https://github.com/ReddingLab/smtools/blob/master/images/curtain_finder.png)
