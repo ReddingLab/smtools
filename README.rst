@@ -29,6 +29,9 @@ The easiest way to install the package is via ``pip``::
 
     $ pip install smtools
 
+Alternatively, the version under development lives here, and can be installed by::
+
+    $ pip install git+https://github.com/ReddingLab/smtools
 
 Documentation
 -------------
