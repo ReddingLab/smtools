@@ -44,7 +44,6 @@ When executed, the following code will yield the image output below.
     import smtools.testdata as test
     import smtools.alignment as al
     import matplotlib.pyplot as plt
-
     dx, dy, params = al.inspect_global_fit(test.image_stack(), showplot=False)
     im = test.image_stack()[0]
     im_old = al.overlay(im)
@@ -93,12 +92,11 @@ a DNA curtain.
 
 Version History
 ---------------
-| 0.1.0  Initial release with alignment, point_fitting modules
-| 0.2.0  Included curtains and misc modules
+  * 0.1.0  Initial release with alignment, point_fitting modules
+  * 0.2.0  Included curtains and misc modules
 
 
 References
 ----------
   * PyPI Page: https://pypi.org/project/smtools/
-  * Github: https://github.com/ReddingLab/smtools
   * Readthedocs: https://smtools.readthedocs.io/en/latest/
