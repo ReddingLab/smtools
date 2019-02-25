@@ -10,7 +10,7 @@ setuptools.setup(
     description="Redding Lab analysis tools",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/github/ReddingLab/smtools",
+    url="https://github.com/ReddingLab/smtools",
     packages=setuptools.find_packages(),
     package_data={'smtools': ['testdata/*.tif']},
     include_package_data=True,
