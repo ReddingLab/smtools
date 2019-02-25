@@ -92,8 +92,8 @@ a DNA curtain.
 
 Version History
 ---------------
-  * 0.1.0  Initial release with alignment, point_fitting modules
-  * 0.2.0  Included curtains and misc modules
+  * 0.1.0  Initial release with *alignment*, `point_fitting` modules
+  * 0.2.0  Included `curtains` and `misc` modules
 
 
 References
