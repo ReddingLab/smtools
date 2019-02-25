@@ -63,13 +63,11 @@ When executed, the following code will yield the image output below.
 
 The `smtools.curtains` module is designed to locate individual DNA molecules within
 a DNA curtain.
-
 .. code-block:: python
 
     import smtools.curtains as cs
     import smtools.alignment as al
     from scipy.ndimage.interpolation import rotate
-    from skimage.external.tifffile import imread
     import matplotlib.pyplot as plt
     import smtools.testdata as test
     im = test.test_curtain()
