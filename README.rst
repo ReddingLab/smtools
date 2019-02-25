@@ -39,6 +39,7 @@ Usage
 The `smtools.algnment` module is designed to align images split into separate
 channels. It relies on using fluorescent particles that appear on both channels.
 When executed, the following code will yield the image output below.
+
 .. code-block:: python
 
     import smtools.testdata as test
@@ -63,6 +64,7 @@ When executed, the following code will yield the image output below.
 
 The `smtools.curtains` module is designed to locate individual DNA molecules within
 a DNA curtain.
+
 .. code-block:: python
 
     import smtools.curtains as cs
