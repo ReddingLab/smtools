@@ -5,7 +5,8 @@ smtools
 Single Molecule analysis Tools
 ------------------------------
 
-This package contains tools analysis package of the `Redding Lab`_, at the University of Cailfornia, San Francisco.
+This package contains a package written for the analysis of single
+molecule data by the `Redding Lab`_, at the University of Cailfornia, San Francisco.
 
 .. _Redding Lab: https://www.reddinglab.com
 
@@ -39,8 +40,14 @@ Usage
 Alignment
 ~~~~~~~~~
 
-The `smtools.algnment` module is designed to align images split into separate
-channels. It relies on using fluorescent particles that appear on both channels.
+The `smtools.algnment` module is designed to align images that were split
+into separate channels during data collection. It relies on using
+fluorescent particles that appear in both channels. To see how it works
+see our walkthrough `here`_(also `finding maxima`_ and `fitting gaussians`_)
+
+.. _here: https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/4__Image-alignment-with-toolbox.ipynb
+.. _finding maxima: https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/2__finding-local-maxima.ipynb
+.. _fitting gaussians: https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/3__fitting-gaussians.ipynb
 
 .. code-block:: python
 
@@ -67,8 +74,13 @@ channels. It relies on using fluorescent particles that appear on both channels.
 Detecting DNA curtains
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The `smtools.curtains` module is designed to locate individual DNA molecules within
-a DNA curtain.
+The `smtools.curtains` module is designed to locate, and fit the intensity
+profile of individual DNA molecules within a DNA curtain. For a description
+of how it works see our walkthroughs `part 1`_, `part 2`_, and `part 3`_.
+
+.. _part 1: https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/5__DNA_curtain_finder_1.ipynb
+.. _part 2: https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/6__DNA_curtain_finder_2.ipynb
+.. _part 3: https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/7__DNA_curtain_finder_3.ipynb
 
 .. code-block:: python
 
