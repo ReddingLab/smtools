@@ -43,7 +43,7 @@ Alignment
 The `smtools.algnment` module is designed to align images that were split
 into separate channels during data collection. It relies on using
 fluorescent particles that appear in both channels. To see how it works
-see our walkthrough `here`_(also `finding maxima`_ and `fitting gaussians`_)
+see our walkthrough `here`_ also `finding maxima`_ and `fitting gaussians`_.
 
 .. _here: https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/4__Image-alignment-with-toolbox.ipynb
 .. _finding maxima: https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/2__finding-local-maxima.ipynb
