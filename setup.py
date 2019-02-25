@@ -1,15 +1,16 @@
 import setuptools
+import os
 
-with open("README.md", "r") as f:
-    long_description = f.read()
+def read(fname):
+    with open(os.path.join(os.path.dirname(__file__), fname)) as f:
+        return f.read()
 
 setuptools.setup(
     name="smtools",
-    version="0.2.0",
+    version="0.2.2",
     author="Sy Redding",
     description="Redding Lab analysis tools",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description=read('README.rst'),
     url="https://github.com/ReddingLab/smtools",
     packages=setuptools.find_packages(),
     package_data={'smtools': ['testdata/*.tif']},

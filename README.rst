@@ -3,7 +3,7 @@ smtools
 =======
 
 Single Molecule analysis Tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 This package contains tools analysis package of the `Redding Lab`_, at the University of Cailfornia, San Francisco.
 
@@ -30,15 +30,17 @@ The easiest way to install the package is via ``pip``::
 
 
 Documentation
-------------
+-------------
 Documentation: https://smtools.readthedocs.io/en/latest/
 
 Usage
 -----
 
+Alignment
+~~~~~~~~~
+
 The `smtools.algnment` module is designed to align images split into separate
 channels. It relies on using fluorescent particles that appear on both channels.
-When executed, the following code will yield the image output below.
 
 .. code-block:: python
 
@@ -61,6 +63,9 @@ When executed, the following code will yield the image output below.
 
 .. figure:: https://github.com/ReddingLab/smtools/blob/master/images/alignment.png
    :alt:
+
+Detecting DNA curtains
+~~~~~~~~~~~~~~~~~~~~~~
 
 The `smtools.curtains` module is designed to locate individual DNA molecules within
 a DNA curtain.
@@ -92,11 +97,12 @@ a DNA curtain.
 
 Version History
 ---------------
-  * 0.1.0  Initial release with *alignment*, `point_fitting` modules
+  * 0.1.0  Initial release with `alignment`, `point_fitting` modules
   * 0.2.0  Included `curtains` and `misc` modules
 
 
 References
 ----------
+  * Github: https://github.com/ReddingLab/smtools/
   * PyPI Page: https://pypi.org/project/smtools/
   * Readthedocs: https://smtools.readthedocs.io/en/latest/
