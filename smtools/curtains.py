@@ -145,7 +145,7 @@ def find_curtain(Image, distance=50, line_length=40,
     for j in peaks_start:
         for k in peaks_end:
             if (abs(j - k) > line_length and abs(
-                    j - k) < line_length + 20
+                    j - k) < line_length + 20 and k > j
                     and smoothed_starts[j] > 1. and smoothed_ends[
                         k] > 1.):
                 curtains.append((j, k))
