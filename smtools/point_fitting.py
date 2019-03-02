@@ -136,7 +136,7 @@ def fit_routine(Image, x, y, bbox):
         initial_guess = (1, x, y, 1, 1, 0, 0)
         try:
             popt, pcov = curve_fit(two_d_gaussian, (X, Y), scaled, p0=initial_guess)
-        except RuntimeError:
+        except (RuntimeError, ValueError):
             popt = None
     else:
         popt = None
