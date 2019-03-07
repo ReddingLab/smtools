@@ -353,7 +353,7 @@ def fit_DNA(Image, locations, constraints=None,
                                        p0=init_guess_center)
                 if np.sqrt(pcov[2][2]) / popt[2] < cen_err and popt[
                     3] < cen_dev:
-                    center = i[2] - 2.5 + popt[2]
+                    center = i[2] - 2 + popt[2]
                 else:
                     center = None
             except RuntimeError:
