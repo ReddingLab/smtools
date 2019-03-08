@@ -401,9 +401,6 @@ def inspect_individual_fits(im_stack, bbox=9, fsize=10,
         axlist[count].bar(x_bincens, x_vals[0], width=binwidth / 2,
                           color="#008fd5")
 
-        print(x_vals)
-        print(count)
-
         if init_params is None:
             p0 = [x_bincens[np.argmax(x_vals[0])],
                   .2, 1, max(x_vals[0]), 0]
