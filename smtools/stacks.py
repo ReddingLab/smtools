@@ -12,8 +12,8 @@ __version__ = "0.1.0"
 __author__ = 'Sy Redding'
 
 import os
-#from smtools.alignment import im_split
-#from skimage.external.tifffile import imread
+from smtools.alignment import im_split
+from skimage.external.tifffile import imread
 
 
 def releaf(Image1, Image2):

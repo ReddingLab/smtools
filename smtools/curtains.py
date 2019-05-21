@@ -9,10 +9,10 @@ __version__ = '0.3.0'
 __author__ = 'Sy Redding'
 
 ########################################################################
-#from smtools.misc import super_gauss_function, mundane_gauss_function
-#from skimage.feature import canny
-#from skimage.transform import probabilistic_hough_line
-#from skimage.exposure import equalize_adapthist
+from smtools.misc import super_gauss_function, mundane_gauss_function
+from skimage.feature import canny
+from skimage.transform import probabilistic_hough_line
+from skimage.exposure import equalize_adapthist
 from scipy.signal import find_peaks, savgol_filter
 from scipy.optimize import curve_fit
 import numpy as np

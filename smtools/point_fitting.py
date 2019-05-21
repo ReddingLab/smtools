@@ -10,11 +10,11 @@ __author__ = 'Sy Redding'
 
 
 import numpy as np
-#import skimage.filters as skim
+import skimage.filters as skim
 import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
 from scipy.optimize import curve_fit
-#from smtools.misc import two_d_gaussian
+from smtools.misc import two_d_gaussian
 
 
 

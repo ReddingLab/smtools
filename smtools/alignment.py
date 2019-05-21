@@ -23,13 +23,13 @@ __author__ = 'Sy Redding and Liv Jensen'
 
 import numpy as np
 import random as ra
-#import matplotlib.pyplot as plt
-#from smtools.misc import skewnormal
-#from smtools.point_fitting import find_maxima, fit_routine
+import matplotlib.pyplot as plt
+from smtools.misc import skewnormal
+from smtools.point_fitting import find_maxima, fit_routine
 from scipy.spatial import cKDTree
 from scipy.ndimage import map_coordinates
 from scipy.optimize import curve_fit
-#from skimage.transform import warp_coords, rotate
+from skimage.transform import warp_coords, rotate
 
 
 ########################################################################
