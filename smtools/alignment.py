@@ -13,7 +13,7 @@ __all__ = ['im_split', 'get_offset_distribution',
            'inspect_individual_fits', 'align_by_offset',
            'overlay']
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 __author__ = 'Sy Redding and Liv Jensen'
 
@@ -23,32 +23,40 @@ __author__ = 'Sy Redding and Liv Jensen'
 
 import numpy as np
 import random as ra
-import matplotlib.pyplot as plt
-from smtools.misc import skewnormal
-from smtools.point_fitting import find_maxima, fit_routine
+#import matplotlib.pyplot as plt
+#from smtools.misc import skewnormal
+#from smtools.point_fitting import find_maxima, fit_routine
 from scipy.spatial import cKDTree
 from scipy.ndimage import map_coordinates
 from scipy.optimize import curve_fit
-from skimage.transform import warp_coords, rotate
+#from skimage.transform import warp_coords, rotate
 
 
 ########################################################################
+def im_split(Image, splitstyle="hsplit"):
+    return getattr(np, splitstyle)(Image, 2)[0], \
+           getattr(np, splitstyle)(Image, 2)[1]
+
 
 def clean_duplicate_maxima(dist, indexes):
     paired_indexes = []
-    count = 0
+    count = -1
     for i in set(indexes):
-        tmp = [np.inf, np.inf]
+        tmp_dist = np.inf
+        tmp = None
         for j, k in zip(indexes, dist):
-            if i == j and k < abs(tmp[1]):
-                tmp = [j, count]
+            if i == j:
                 count += 1
-            elif i == j:
-                count += 1
+                if k < tmp_dist:
+                    tmp = [j, count]
+                    tmp_dist = k
             else:
                 pass
-        paired_indexes.append(tmp)
+        if tmp is not None:
+            paired_indexes.append(tmp)
     return paired_indexes
+
+
 
 def make_bins(data, width):
     return np.arange(min(data), max(data) + width, width)
@@ -81,38 +89,6 @@ def find_global_offset(im_stack, bbox=9, splitstyle="hsplit",
 
 
 ########################################################################
-
-
-def im_split(Image, splitstyle="hsplit"):
-    """
-    Image passed to this function is split into two channels based on
-    "splitstyle".
-    ***note*** micromanager images and numpy arrays are indexed
-    opposite of one another.
-
-    :param Image: 2D image array
-    :param splitstyle: str, accepts "hsplit", "vsplit". Default is
-        "hsplit"
-
-    :return: The two subarrays of Image split along specified axis.
-
-    :Example:
-
-        >>> from smtools.alignment import im_split
-        >>> import smtools.testdata as test
-        >>> im = test.image_stack()[0]
-        >>> ch1, ch2 = im_split(im)
-        >>> ch1.shape, ch2.shape
-        ((512, 256), (512, 256))
-        >>> ch1, ch2 = im_split(im, "vsplit")
-        >>> ch1.shape, ch2.shape
-        ((256, 512), (256, 512))
-    """
-    return getattr(np, splitstyle)(Image, 2)[0], \
-           getattr(np, splitstyle)(Image, 2)[1]
-
-
-
 
 
 def get_offset_distribution(Image, bbox=9, splitstyle="hsplit",
@@ -154,13 +130,13 @@ def get_offset_distribution(Image, bbox=9, splitstyle="hsplit",
     mytree = cKDTree(ch1_maxima)
     dist, indexes = mytree.query(ch2_maxima)
     for i, j in clean_duplicate_maxima(dist, indexes):
-        x1, y1 = ch1_maxima[i]
-        x2, y2 = ch2_maxima[j]
-        fit_ch1 = fit_routine(ch1, x1, y1, bbox)
-        fit_ch2 = fit_routine(ch2, x2, y2, bbox)
+        fit_ch1 = fit_routine(ch1, [ch1_maxima[i]], bbox)
+        fit_ch2 = fit_routine(ch2, [ch2_maxima[j]], bbox)
         try:
-            Delta_x.append(fit_ch1[1] - fit_ch2[1])
-            Delta_y.append(fit_ch1[2] - fit_ch2[2])
+            x1, y1 = fit_ch1[0]
+            x2, y2 = fit_ch2[0]
+            Delta_x.append(x1 - x2)
+            Delta_y.append(y1 - y2)
 
         except TypeError:
             pass

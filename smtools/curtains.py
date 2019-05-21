@@ -1,27 +1,18 @@
 #!/usr/bin/env python
 
 
-"""
-The curtains module contains functions used locating flourescently
-labeled DNA curtains. See our walkthroughs (
-`part 1 <https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/5__DNA_curtain_finder_1.ipynb>`_ ,
-`part 2 <https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/6__DNA_curtain_finder_2.ipynb>`_ ,
-and `part 3 <https://github.com/ReddingLab/Learning/blob/master/image-analysis-basics/7__DNA_curtain_finder_3.ipynb>`_ )
-of the curtains module's usage.
-"""
-
 __all__ = ['find_rotang', 'find_curtain',
            'find_DNA', 'fit_DNA']
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 __author__ = 'Sy Redding'
 
 ########################################################################
-from smtools.misc import super_gauss_function, mundane_gauss_function
-from skimage.feature import canny
-from skimage.transform import probabilistic_hough_line
-from skimage.exposure import equalize_adapthist
+#from smtools.misc import super_gauss_function, mundane_gauss_function
+#from skimage.feature import canny
+#from skimage.transform import probabilistic_hough_line
+#from skimage.exposure import equalize_adapthist
 from scipy.signal import find_peaks, savgol_filter
 from scipy.optimize import curve_fit
 import numpy as np
@@ -181,12 +172,12 @@ def find_DNA(Image, Bounds, prominence=None):
         (x_min, x_max, y_min, y_max) for each curtain in the image.
         written to accept output from toolbox.curtains.find_curtain
     :param prominence: passes to
-        `peak_finder <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html>`_
+        `peak_finder
+        <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html>`_
         Defaults to (20, 1.5 * max(array)
 
     :return: List of tuples: (top, bottom, and center). Locations of
-    each DNA strand detected in pixels.
-
+        each DNA strand detected in pixels.
     :Example:
         >>> import smtools.curtain as cs
         >>> import smtools.testdata as test
@@ -361,3 +352,114 @@ def fit_DNA(Image, locations, constraints=None,
             if all((top, bottom, center)):
                 output.append((top, bottom, center))
     return output
+
+
+class Curtain(object):
+    """
+    Collection into a Curtain .
+
+    Parameters
+    ----------
+    DNA : :obj:`list`
+       Accepts output from `fit DNA`
+    points : :obj:`list` or :obj:`list of tuples`
+       points to apply to DNA
+
+    Example
+    -------
+        >>> import smtools.curtain as cs
+        >>> import smtools.testdata as test
+        >>> from scipy.ndimage.interpolation import rotate
+        >>> im = test.test_curtain()
+        >>> ch1,ch2 = al.im_split(i)
+        >>> angle = cs.find_rotang(ch2)
+        >>> rotated_ch2 = rotate(ch2,angle)
+        >>> bounds, mask = cs.find_curtain(rotated_ch2)
+        >>> strands = cs.find_DNA(rotated_ch2,bounds)
+        >>> DNAs = cs.fit_DNA(rotated_ch2, strands)
+        >>> strands = Curtain(DNAs)
+        >>> strands.assign_points(test.test_points())
+        >>> data = strands.get_DNA()
+        >>> print(data)
+    """
+
+    def __init__(self, DNA):
+        """
+        :param DNA: Accepts list directly from `fit_curtains`
+        """
+        self.DNA = DNA
+        self.DNA_dictionary()
+
+        self.minimum_length = 4
+
+    def DNA_dictionary(self):
+        self.DNA_dictionary = {}
+        for i in self.DNA:
+            self.DNA_dictionary[i] = []
+
+    def add_point(self, key, point):
+        """
+        :param key: keys to DNA_dictionary
+        :param point: (x,y)
+        """
+        self.DNA_dictionary[key].append(point)
+
+    def assign_points(self, points, frame=None,
+                      pad=5, max_offset=1):
+        """
+        :param points: 1D list of (x,y) points
+        :param frame: frame number if data are from image stack
+        :param pad: additional extension to length of DNA applied to
+            top and bottom position when assigning points.
+        :param max_offset: maximum distance from center of DNA strand
+            that still allows a point to be assigned to it.
+        """
+        for x, y in points:
+            for each in self.DNA_dictionary:
+                if (x > each[0] and x < each[1] + pad
+                        and y > each[2] - max_offset
+                        and y < each[2] + max_offset):
+                    if frame is None:
+                        self.DNA_dictionary[each].append((x, y))
+                    else:
+                        self.DNA_dictionary[each].append((x, y, frame))
+
+
+    def assign_point_stack(self, points_list,
+                           pad=5, max_offset=1):
+        """
+        :param points_list: list of 1D lists of (x,y) points
+        :param pad: additional extension to length of DNA applied to
+            top and bottom position when assigning points.
+        :param max_offset: max_offset: maximum distance from center of DNA strand
+            that still allows a point to be assigned to it.
+        """
+        frame = 0
+        for i in points_list:
+            self.assign_points(i, frame, pad, max_offset)
+            frame += 1
+
+    def get_DNA(self):
+        """
+        :return: dict, Keys are (top, bottom, center) for each DNA
+            strand. Entries are lists of points (x, y) or (x, y, frame)
+        """
+        return (self.DNA_dictionary)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

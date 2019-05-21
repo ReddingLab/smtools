@@ -1,0 +1,187 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Misc Module &#8212; smtools 0.3.0 documentation</title>
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Stacks Module" href="stacks.html" /> 
+  </head>
+  <body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">smtools 0.3.0 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="stacks.html" title="Stacks Module"
+             accesskey="P">previous</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="toctree-wrapper compound">
+</div>
+<div class="section" id="module-misc">
+<span id="misc-module"></span><h1>Misc Module<a class="headerlink" href="#module-misc" title="Permalink to this headline">¶</a></h1>
+<p>The misc module contains commonly used functions.</p>
+<dl class="function">
+<dt id="misc.two_d_gaussian">
+<code class="descclassname">misc.</code><code class="descname">two_d_gaussian</code><span class="sig-paren">(</span><em>span</em>, <em>amplitude</em>, <em>mu_x</em>, <em>mu_y</em>, <em>sigma_x</em>, <em>sigma_y</em>, <em>theta</em>, <em>baseline</em><span class="sig-paren">)</span><a class="headerlink" href="#misc.two_d_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function">2D Gaussian distribution</a></p>
+<div class="math">
+\begin{gather*}
+f(x,y) = \text{baseline} + A \exp \left [ -(x-\mu_x)^2 -
+2b (
+x-\mu_x)(
+y-\mu_y) - c(y-\mu_y)^2 \right ]  \\
+
+a = \frac{\cos^2\theta}{2\sigma_x^2} +
+    \frac{\sin^2\theta}{2\sigma_y^2}  \\
+
+b = -\frac{\sin 2\theta}{4\sigma_x^2} +
+    \frac{\sin 2\theta}{4\sigma_y^2} \\
+
+a = \frac{\sin^2\theta}{2\sigma_x^2} +
+    \frac{\cos^2\theta}{2\sigma_y^2}
+\end{gather*}</div></dd></dl>
+
+<dl class="function">
+<dt id="misc.super_gauss_function">
+<code class="descclassname">misc.</code><code class="descname">super_gauss_function</code><span class="sig-paren">(</span><em>x</em>, <em>baseline</em>, <em>amplitude</em>, <em>mean</em>, <em>sigma</em>, <em>power</em><span class="sig-paren">)</span><a class="headerlink" href="#misc.super_gauss_function" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Gaussian_function#Higher-order_Gaussian_or_super-Gaussian_function">Higher order Gaussian</a></p>
+<div class="math">
+\[f(x) = \text{baseline} +
+        A \exp \left [ \left ( \frac{x-\mu_x}{
+        2\sigma^2_x}\right)^p\right]\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="misc.mundane_gauss_function">
+<code class="descclassname">misc.</code><code class="descname">mundane_gauss_function</code><span class="sig-paren">(</span><em>x</em>, <em>baseline</em>, <em>amplitude</em>, <em>mean</em>, <em>sigma</em><span class="sig-paren">)</span><a class="headerlink" href="#misc.mundane_gauss_function" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Gaussian_function">Gaussian distribution</a></p>
+<div class="math">
+\[f(x) = \text{baseline} +
+        A \exp \left [ \frac{x-\mu_x}{
+        2\sigma^2_x}\right]\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="misc.skewnormal">
+<code class="descclassname">misc.</code><code class="descname">skewnormal</code><span class="sig-paren">(</span><em>x</em>, <em>loc</em>, <em>scale</em>, <em>shape</em>, <em>amplitude</em>, <em>baseline</em><span class="sig-paren">)</span><a class="headerlink" href="#misc.skewnormal" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Skew_normal_distribution">skewnormal distribution</a></p>
+<div class="math">
+\begin{gather*}
+f(x) = \text{baseline} + \frac{2A}{\text{scale}} \phi(t)
+\Phi(\alpha t)  \\
+
+\phi(x) = \frac{1}{\sqrt{2 \pi}} e^{- \frac{t^2}{2}} \\
+
+\Phi(x) = \frac{1}{2} \left [1+ \text{erf} \left(
+           \frac{t}{ \sqrt{2}}  \right) \right ]  \\
+
+t \to \frac{x-\text{location}}{\text{scale}}
+
+\end{gather*}</div></dd></dl>
+
+<dl class="function">
+<dt id="misc.straight_line">
+<code class="descclassname">misc.</code><code class="descname">straight_line</code><span class="sig-paren">(</span><em>x</em>, <em>m</em>, <em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#misc.straight_line" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Line_(geometry)#On_the_Cartesian_plane">line</a></p>
+<div class="math">
+\[f(x) = mx+b\]</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <p class="caption"><span class="caption-text">PACKAGE CONTENTS:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="point_fitting.html">point_fitting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="alignment.html">Alignment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="curtains.html">curtains</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stacks.html">Stacks Module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Misc Module</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+            </form>
+          </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="stacks.html" title="Stacks Module"
+              >previous</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/misc_module.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Redding Lab, UCSF.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>
