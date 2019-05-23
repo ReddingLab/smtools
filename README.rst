@@ -125,3 +125,4 @@ References
 
 
 .. |pypi| image:: https://img.shields.io/pypi/v/smtools.svg
+    :target: https://pypi.org/project/smtools/
