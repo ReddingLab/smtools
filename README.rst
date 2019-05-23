@@ -121,3 +121,6 @@ References
   * Github: https://github.com/ReddingLab/smtools/
   * PyPI Page: https://pypi.org/project/smtools/
   * Readthedocs: https://smtools.readthedocs.io/en/latest/
+
+
+[![pypi](https://img.shields.io/pypi/v/smtools.svg)

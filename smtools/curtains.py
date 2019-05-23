@@ -439,6 +439,32 @@ class Curtain(object):
             self.assign_points(i, frame, pad, max_offset)
             frame += 1
 
+    def pairwise(self):
+        """
+
+        :return:
+        """
+        spacing = []
+        for i in self.DNA_dictionary:
+            if len(self.DNA_dictionary[i]) > 1:
+                positions = [x for x, y in self.DNA_dictionary[i]]
+                for pair in combinations(positions, 2):
+                    print(abs(pair[0] - pair[1]))
+                    spacing.append(abs(pair[0] - pair[1]))
+        return spacing
+
+
+    def per_strand_counts(self):
+        """
+
+        :return:
+        """
+        counts = []
+        for i in self.DNA_dictionary:
+            counts.append(len(self.DNA_dictionary[i]))
+        return counts
+
+
     def get_DNA(self):
         """
         :return: dict, Keys are (top, bottom, center) for each DNA
