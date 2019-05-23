@@ -4,6 +4,7 @@ smtools
 
 Single Molecule analysis Tools
 ------------------------------
+|pypi|
 
 This is a package written for the analysis of single
 molecule data by the `Redding Lab`_, at the University of Cailfornia, San Francisco.
