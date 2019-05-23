@@ -123,4 +123,4 @@ References
   * Readthedocs: https://smtools.readthedocs.io/en/latest/
 
 
-[![pypi](https://img.shields.io/pypi/v/smtools.svg)
+.. |pypi| image:: https://img.shields.io/pypi/v/smtools.svg
