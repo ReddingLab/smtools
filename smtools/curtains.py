@@ -474,6 +474,30 @@ class Curtain(object):
 
 
 
+"""
+class DNA(object):
+
+    def __init__(self, x0,x1,y):
+        self.x0 = x0
+        self.x1 = x1
+        self.y = y
+
+        self.binding_events = []
+        self.Cas9 = []
+
+    def extension(self):
+        return self.x1-self.x0
+
+    def scale(self):
+
+    def assign_points(self, points, frame=None,
+                          pad=5, max_offset=1):
+        for x, y in points:
+            self.binding_events = []
+
+    def position(self):
+"""
+
 
 
 
