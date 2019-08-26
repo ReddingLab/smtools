@@ -377,7 +377,7 @@ def fit_DNA(Image, locations, constraints=None,
             except RuntimeError:
                 center = None
             if all((top, bottom, center)):
-                output.append((top, bottom, center))
+                output.append(((top, center), (bottom, center)))
     return output
 
 
@@ -403,7 +403,7 @@ class DNA(object):
     def assign_points(self, points, max_offset=1):
         for x, y, t in points:
             d = np.cross(self.bottom - self.top, self.top - np.array(
-                (x,y)))//self.extension
+                (x, y))) / self.extension
             if (self.top[0] <= x <= self.bottom[0] and max_offset >=
                     abs(d)):
                 self.assigned_points.append((x, y, t))
@@ -413,12 +413,20 @@ class DNA(object):
             d1 = norm(np.array((x, y)) - self.top)
             d2 = np.cross(self.bottom - self.top,
                           self.top - np.array((x, y))) / self.extension
-            d3 = np.sqrt((d1**2) - (d2**2))
+            d3 = np.sqrt((d1 ** 2) - (d2 ** 2))
             scaled_x = d3 / self.extension * length
             self.scaled_points.append((scaled_x, y, t))
 
     def binding_count(self):
         return len(self.assigned_points)
+
+    def binding_data(self):
+        if len(self.scaled_points):
+            return [i[0] for i in self.scaled_points]
+        elif len(self.assigned_points):
+            return [i[0] for i in self.assigned_points]
+        else:
+            return None
 
     def pairwise(self):
         if len(self.scaled_points) > 1:
@@ -432,4 +440,3 @@ class DNA(object):
             unique = np.unique(distance.cdist(arr[:, :2], arr[:, :2],
                                               'euclidean'))
             return unique.tolist()
-
