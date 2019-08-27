@@ -398,6 +398,7 @@ class DNA(object):
         self.extension = norm(self.bottom - self.top)
 
         self.assigned_points = []
+        self.pixels_from_end = []
         self.scaled_points = []
 
     def assign_points(self, points, max_offset=1):
@@ -407,6 +408,14 @@ class DNA(object):
             if (self.top[0] <= x <= self.bottom[0] and max_offset >=
                     abs(d)):
                 self.assigned_points.append((x, y, t))
+
+    def distance_from_end(self):
+        for x, y, t in self.assigned_points:
+            d1 = norm(self.bottom - np.array((x, y)))
+            d2 = np.cross(self.bottom - self.top,
+                          self.top - np.array((x, y))) / self.extension
+            x_FromEnd = np.sqrt((d1 ** 2) - (d2 ** 2))
+            self.pixels_from_end.append((x_FromEnd, y, t))
 
     def scale_to_bp(self, length=48502):
         for x, y, t in self.assigned_points:
@@ -421,7 +430,9 @@ class DNA(object):
         return len(self.assigned_points)
 
     def binding_data(self):
-        if len(self.scaled_points):
+        if len(self.pixels_from_end):
+            return [i[0] for i in self.pixels_from_end]
+        elif len(self.scaled_points):
             return [i[0] for i in self.scaled_points]
         elif len(self.assigned_points):
             return [i[0] for i in self.assigned_points]
@@ -440,5 +451,3 @@ class DNA(object):
             unique = np.unique(distance.cdist(arr[:, :2], arr[:, :2],
                                               'euclidean'))
             return unique.tolist()
-
-"""heres a  docstring """
