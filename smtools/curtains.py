@@ -6,7 +6,7 @@ __all__ = ['find_rotang', 'find_curtain',
 
 __version__ = '0.3.0'
 
-__author__ = 'Sy Redding'
+__author__ = 'Sy Redding and Luke Strauskulage'
 
 ########################################################################
 from smtools.misc import super_gauss_function, mundane_gauss_function
