@@ -109,11 +109,11 @@ def fit_routine(Image, points, bbox, err = 2,
                     np.sqrt(pcov[2][2]) < err):
                     fits.append((popt[1],popt[2]))
                 else:
-                    pass
+                    fits.append(None)
             except (RuntimeError, ValueError):
-                pass
+                fits.append(None)
         else:
-            pass
+            fits.append(None)
 
     #-- filtering points by proximity
     dist_arr = np.tril(cdist(fits, fits, 'euclidean'))
@@ -122,6 +122,6 @@ def fit_routine(Image, points, bbox, err = 2,
     indexes = list(set(np.concatenate((arr[0], arr[1]))))
     for index in sorted(indexes, reverse=True):
         del fits[index]
-        
+
     fits = [i + (frame,) for i in fits]
     return(fits)
