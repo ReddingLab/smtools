@@ -133,12 +133,12 @@ def get_offset_distribution(Image, bbox=9, splitstyle="hsplit",
         fit_ch1 = fit_routine(ch1, [ch1_maxima[i]], bbox)
         fit_ch2 = fit_routine(ch2, [ch2_maxima[j]], bbox)
         try:
-            x1, y1 = fit_ch1[0]
-            x2, y2 = fit_ch2[0]
+            x1, y1, t1 = fit_ch1[0]
+            x2, y2, t2 = fit_ch2[0]
             Delta_x.append(x1 - x2)
             Delta_y.append(y1 - y2)
 
-        except TypeError:
+        except (IndexError,TypeError):
             pass
     return (Delta_x, Delta_y)
 
@@ -180,8 +180,8 @@ def plot_assigned_maxima(Image, splitstyle="hsplit", fsize=10):
     mytree = cKDTree(ch1_maxima)
     dist, indexes = mytree.query(ch2_maxima)
     for i, j in clean_duplicate_maxima(dist, indexes):
-        x1, y1 = ch1_maxima[i]
-        x2, y2 = ch2_maxima[j]
+        x1, y1, t1 = ch1_maxima[i]
+        x2, y2, t2 = ch2_maxima[j]
         tmp_color = (
         ra.uniform(0, 1), ra.uniform(0, 1), ra.uniform(0, 1))
         plt.plot(x1, y1, color=tmp_color, marker='+')
