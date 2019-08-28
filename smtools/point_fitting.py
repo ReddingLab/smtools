@@ -14,6 +14,7 @@ import skimage.filters as skim
 import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
 from scipy.optimize import curve_fit
+from scipy.spatial.distance import cdist
 from smtools.misc import two_d_gaussian
 
 
