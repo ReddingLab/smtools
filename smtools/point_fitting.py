@@ -56,7 +56,8 @@ def find_maxima(image,size,threshold_method = "threshold_mean"):
         points.append((dx.start,dy.start)) 
     return points
 
-def fit_routine(Image, points, bbox, err = 2):
+def fit_routine(Image, points, bbox, err = 2,
+                frame = 1, minimum_separation = 1.5):
     """
     Fits a 2D gaussian function to 2D image array. "x", "y",
         and "bbox" define an ROI fit by ``two_d_gaussian`` using
@@ -69,12 +70,15 @@ def fit_routine(Image, points, bbox, err = 2):
         odd integer
     :param err: int or float. Threshold for the error on the fit of the
         Gaussian mean. Applied to both the mean in x and y.
+    :param frame: int or float. Frame number or time value
+    :param minimum_separation: int or float. minimum distance between
+        two fitted points
 
     :return: 1D array of optimal (x,y) positions from gaussian fit.
         If ROI falls (partially or otherwise) outside Image,
         or, if curve_fit raises RuntimeError or ValueError,
-        or, if the error threshold is crossed, then return
-        value is None.
+        or, if the error threshold is crossed, then that maxima is
+        passed over.
 
     :Example:
         >>> import smtools.point_fitting as pt
@@ -105,10 +109,19 @@ def fit_routine(Image, points, bbox, err = 2):
                     np.sqrt(pcov[2][2]) < err):
                     fits.append((popt[1],popt[2]))
                 else:
-                    fits.append(None)
-
+                    pass
             except (RuntimeError, ValueError):
-                fits.append(None)
+                pass
         else:
-            fits.append(None)
+            pass
+
+    #-- filtering points by proximity
+    dist_arr = np.tril(cdist(fits, fits, 'euclidean'))
+    arr = np.where((dist_arr < minimum_separation) & (
+            dist_arr > 0))
+    indexes = list(set(np.concatenate((arr[0], arr[1]))))
+    for index in sorted(indexes, reverse=True):
+        del fits[index]
+        
+    fits = [i + (frame,) for i in fits]
     return(fits)
