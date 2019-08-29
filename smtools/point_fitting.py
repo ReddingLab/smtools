@@ -125,5 +125,4 @@ def fit_routine(Image, points, bbox, err = 2,
         for index in sorted(indexes, reverse=True):
             del fits[index]
 
-        fits = [i + (frame,) for i in fits]
     return(fits)
