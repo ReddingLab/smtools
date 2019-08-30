@@ -124,5 +124,5 @@ def fit_routine(Image, points, bbox, err = 2,
         indexes = list(set(np.concatenate((arr[0], arr[1]))))
         for index in sorted(indexes, reverse=True):
             del fits[index]
-
+    fits = [i + (frame,) for i in fits]
     return(fits)
