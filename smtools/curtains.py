@@ -233,7 +233,7 @@ def find_DNA(Image, Bounds, prominence=None):
 
 def fit_DNA(Image, locations, constraints=None,
             init_guess_length=None, init_guess_center=None,
-            pad=2, factor=1.3, min_length=45,
+            pad=2, factor=1.3, min_length=45, max_length=56,
             cen_err=.3, cen_dev=3.):
     """
 
@@ -266,6 +266,8 @@ def fit_DNA(Image, locations, constraints=None,
         maximum - ((maximum - minimum)/factor)
     :param min_length: int, minimum allowed length of DNA.
         Default is 45.
+    :param max_length: int, maximum allowed length of DNA.
+        Default is 56.
     :param cen_err: float, maximum error ratio on the mean for the
         call to
         `curve_fit <https://docs.scipy.org/doc/scipy/reference
@@ -341,8 +343,8 @@ def fit_DNA(Image, locations, constraints=None,
                     linedata - super_gauss_function(fine_scale_x,
                                                     *popt)))).flatten()
                 if len(index) == 2:
-                    if fine_scale_x[index[1]] - fine_scale_x[
-                        index[0]] >= min_length:
+                    if min_length <= fine_scale_x[index[1]] - fine_scale_x[
+                        index[0]] <= max_length:
                         top = i[0] + fine_scale_x[index[0]]
                         bottom = i[0] + fine_scale_x[index[1]]
                     else:
