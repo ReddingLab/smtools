@@ -387,11 +387,12 @@ def fit_DNA(Image, locations, constraints=None,
 
 class DNA(object):
 
-    def __init__(self, params):
+    def __init__(self, params, id):
+        """
+        :param params:
         """
 
-        :param params: [(x1,y1), (x2,y2)]
-        """
+        self.id = id
 
         self.params = params
 
@@ -404,6 +405,12 @@ class DNA(object):
         self.scaled_points = []
 
     def assign_points(self, points, max_offset=1):
+        """
+
+        :param points:
+        :param max_offset:
+        :return:
+        """
         for x, y, t in points:
             d = np.cross(self.bottom - self.top, self.top - np.array(
                 (x, y))) / self.extension
@@ -412,6 +419,10 @@ class DNA(object):
                 self.assigned_points.append((x, y, t))
 
     def distance_from_end(self):
+        """
+
+        :return:
+        """
         for x, y, t in self.assigned_points:
             d1 = norm(self.bottom - np.array((x, y)))
             d2 = np.cross(self.bottom - self.top,
@@ -420,6 +431,11 @@ class DNA(object):
             self.pixels_from_end.append((x_FromEnd, y, t))
 
     def scale_to_bp(self, length=48502):
+        """
+
+        :param length:
+        :return:
+        """
         for x, y, t in self.assigned_points:
             d1 = norm(np.array((x, y)) - self.top)
             d2 = np.cross(self.bottom - self.top,
@@ -429,9 +445,17 @@ class DNA(object):
             self.scaled_points.append((scaled_x, y, t))
 
     def binding_count(self):
+        """
+
+        :return:
+        """
         return len(self.assigned_points)
 
     def binding_data(self):
+        """
+
+        :return:
+        """
         if len(self.pixels_from_end):
             return [i[0] for i in self.pixels_from_end]
         elif len(self.scaled_points):
@@ -442,6 +466,10 @@ class DNA(object):
             return None
 
     def pairwise(self):
+        """
+
+        :return:
+        """
         if len(self.scaled_points) > 1:
             arr = np.array(self.scaled_points)
             unique = np.unique(distance.cdist(arr[:, :1], arr[:, :1],
