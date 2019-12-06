@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from itertools import combinations
 
 __all__ = ['find_rotang', 'find_curtain',
            'find_DNA', 'fit_DNA']
@@ -17,6 +17,10 @@ from scipy.signal import find_peaks, savgol_filter
 from scipy.optimize import curve_fit
 from scipy.spatial import distance
 from numpy.linalg import norm
+
+from itertools import combinations
+from sklearn.cluster import KMeans
+from scipy.stats import norm as scinorm
 
 import numpy as np
 import warnings
@@ -403,6 +407,11 @@ class DNA(object):
         self.pixels_from_end = []
         self.scaled_points = []
 
+        self.points_targets = []
+        self.strand_extension = []
+        self.points_pairwise = []
+        self.pairs_used = []
+
     def assign_points(self, points, max_offset=1):
         for x, y, t in points:
             d = np.cross(self.bottom - self.top, self.top - np.array(
@@ -438,6 +447,197 @@ class DNA(object):
             return [i[0] for i in self.scaled_points]
         elif len(self.assigned_points):
             return [i[0] for i in self.assigned_points]
+        else:
+            return None
+
+    def pair_with_target(self, pop_params):
+        for x, y, t in self.pixels_from_end:
+            match = min(pop_params, key = lambda stat: abs(stat[0] - x))
+            pixelmean = match[0]
+            pixelstdev = match [1]
+            bptarget = match[2]
+            if x > (pixelmean + abs(1*pixelstdev)) or x < (pixelmean - abs(1*pixelstdev)):
+                pass
+            else:
+                self.points_targets.append((x, bptarget))
+
+    def matched_events(self):
+        if len(self.points_targets):
+            return [x for x in self.points_targets]
+        else:
+            return None
+
+    def remove_population(self, target, max_target):
+        for each in self.points_targets:
+            if each[1] == target:
+                self.points_targets.remove(each)
+            elif each[1] > max_target:
+                self.points_targets.remove(each)
+            else:
+                pass
+
+    def position_pairwise(self, excluded1):
+        if len(self.points_targets) > 2:
+            pairs = [each for each in combinations(self.points_targets, 2)]
+            for twoevents in pairs:
+                if twoevents[0] > twoevents[1]:
+                    event1 = twoevents[0]
+                    event2 = twoevents[1]
+                else:
+                    event1 = twoevents[1]
+                    event2 = twoevents[0]
+                if event1[1] == event2[1]:
+                    pass
+                elif event1[1] == excluded1 or event2[1] == excluded1:
+                    pass
+                else:
+                    barcode = (event1[1] + event2[1])
+                    pixel_distance = abs(event1[0] - event2[0])
+                    basepair_distance = abs(event1[1] - event2[1])
+                    extension = basepair_distance / pixel_distance
+                    self.strand_extension.append((event1[1], event2[1], barcode,
+                                                  pixel_distance, basepair_distance, extension))
+                    for x, bptarget in self.points_targets:
+                        if x == event1[0] or x == event2[0]:
+                            pass
+                        else:
+                            relative_distance = abs(x - event1[0])
+                            basepair_difference = relative_distance * extension
+                            if x > event1[0]:
+                                measured_position = event1[1] - basepair_difference
+                                self.points_pairwise.append((x, bptarget, measured_position,
+                                                             twoevents, barcode))
+                            else:
+                                measured_position = event1[1] + basepair_difference
+                                self.points_pairwise.append((x, bptarget, measured_position,
+                                                             twoevents, barcode))
+
+    def filtered_pairwise(self, pair_params, excluded1, excluded2):
+        if len(self.points_targets) > 2:
+            pairs = [each for each in combinations(self.points_targets, 2)]
+            for twoevents in pairs:
+                if twoevents[0] > twoevents[1]:
+                    event1 = twoevents[0]
+                    event2 = twoevents[1]
+                else:
+                    event1 = twoevents[1]
+                    event2 = twoevents[0]
+                if event1[1] == event2[1]:
+                    pass
+                elif event1[1] == excluded1 or event2[1] == excluded1:
+                    pass
+                elif event1[1] == excluded2 or event2[1] == excluded2:
+                    pass
+                else:
+                    barcode = (event1[1] + event2[1])
+                    for stats in pair_params:
+                        if barcode == stats[0]:
+                            pixel_distance = abs(event1[0] - event2[0])
+                            basepair_distance = abs(event1[1] - event2[1])
+                            extension = basepair_distance / pixel_distance
+                            if extension > stats[1] + 1*(abs(stats[2])) or extension < stats[1] - 1*(abs(stats[2])):
+                                pass
+                            else:
+                                self.strand_extension.append((event1[1], event2[1], barcode,
+                                                              pixel_distance, basepair_distance, extension))
+                                for x, bptarget in self.points_targets:
+                                    if x == event1[0] or x == event2[0]:
+                                        pass
+                                    else:
+                                        relative_distance = abs(x - event1[0])
+                                        basepair_difference = relative_distance * extension
+                                        if x > event1[0]:
+                                            measured_position = event1[1] - basepair_difference
+                                            calc_error = measured_position - bptarget
+                                            self.points_pairwise.append((x, bptarget, measured_position,
+                                                                         relative_distance, calc_error,
+                                                                         twoevents, barcode))
+                                        else:
+                                            measured_position = event1[1] + basepair_difference
+                                            calc_error = measured_position - bptarget
+                                            self.points_pairwise.append((x, bptarget, measured_position,
+                                                                         relative_distance, calc_error,
+                                                                         twoevents, barcode))
+                        else:
+                            pass
+
+    def filtered_flanking(self, pair_params, excluded1):
+        if len(self.points_targets) > 2:
+            pairs = [each for each in combinations(self.points_targets, 2)]
+            for twoevents in pairs:
+                if twoevents[0] > twoevents[1]:
+                    event1 = twoevents[0]
+                    event2 = twoevents[1]
+                else:
+                    event1 = twoevents[1]
+                    event2 = twoevents[0]
+                if event1[1] == event2[1]:
+                    pass
+                elif event1[1] == excluded1 or event2[1] == excluded1:
+                    pass
+                else:
+                    barcode = (event1[1] + event2[1])
+                    for stats in pair_params:
+                        if barcode == stats[0]:
+                            pixel_distance = abs(event1[0] - event2[0])
+                            basepair_distance = abs(event1[1] - event2[1])
+                            extension = basepair_distance / pixel_distance
+                            if extension > stats[1] + 1*(abs(stats[2])) or extension < stats[1] - 1*(abs(stats[2])):
+                                pass
+                            else:
+                                for x, bptarget in self.points_targets:
+                                    if x == event1[0] or x == event2[0]:
+                                        pass
+                                    if event1[0] < x < event2[0] or event2[0] < x < event1[0]:
+                                        relative_distance = abs(x - event1[0])
+                                        basepair_difference = relative_distance * extension
+                                        if x > event1[0]:
+                                            measured_position = event1[1] - basepair_difference
+                                            calc_error = measured_position - bptarget
+                                            self.points_pairwise.append((x, bptarget, measured_position,
+                                                                         relative_distance, calc_error,
+                                                                         twoevents, barcode))
+                                        else:
+                                            measured_position = event1[1] + basepair_difference
+                                            calc_error = measured_position - bptarget
+                                            self.points_pairwise.append((x, bptarget, measured_position,
+                                                                         relative_distance, calc_error,
+                                                                         twoevents, barcode))
+                                    else:
+                                        pass
+                        else:
+                            pass
+
+    def pair_check(self, excluded1, excluded2):
+        if len(self.points_targets) > 2:
+            pairs = [each for each in combinations(self.points_targets, 2)]
+            for twoevents in pairs:
+                event1 = twoevents[0]
+                event2 = twoevents[1]
+                if event1[1] == event2[1]:
+                    pass
+                elif event1[1] == excluded1 or event2[1] == excluded1:
+                    pass
+                elif event1[1] == excluded2 or event2[1] == excluded2:
+                    pass
+                else:
+                    self.pairs_used.append(twoevents)
+
+    def pairs_list(self):
+        if (len(self.pairs_used)):
+            return [i for i in self.pairs_used]
+        else:
+            return None
+
+    def strand_parameters(self):
+        if (len(self.strand_extension)):
+            return [i for i in self.strand_extension]
+        else:
+            return None
+
+    def calculated_position(self):
+        if(len(self.points_pairwise)):
+            return[i for i in self.points_pairwise]
         else:
             return None
 
