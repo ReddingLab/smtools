@@ -12,6 +12,8 @@ __version__ = "0.1.0"
 __author__ = 'Sy Redding'
 
 import os
+import numpy as np
+import warnings
 from smtools.alignment import im_split
 from skimage.external.tifffile import imread
 
@@ -27,6 +29,14 @@ def releaf(Image1, Image2):
     ch2_left,_ = im_split(Image2)
     return(np.concatenate([ch2_left,ch1_right], axis = 1))
 
+def outerleaf(Image_list):
+    if len(Image_list)%2 == 1:
+        warnings.simplefilter('always')
+        warnings.warn("Warning passed to `outerleaf` contains odd number of images, middle image dropped")
+        warnings.simplefilter('ignore')
+        return Image_list[:(len(Image_list)//2)-1],Image_list[len(Image_list)//2:]
+    else:
+        return Image_list[:len(Image_list)//2],Image_list[len(Image_list)//2:]
 
 def interleaf(stack_0, stack_1, invert=False):
     """
@@ -62,7 +72,7 @@ def interleaf(stack_0, stack_1, invert=False):
 
 def read_stack_to_channels(directory):
     """
-
+    requires digital modulation
     :param directory:
     :return:
     """
