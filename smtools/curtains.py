@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-
+from itertools import combinations
 
 __all__ = ['find_rotang', 'find_curtain',
            'find_DNA', 'fit_DNA']
 
 __version__ = '0.3.0'
 
-__author__ = 'Sy Redding'
+__author__ = 'Sy Redding and Luke Strauskulage'
 
 ########################################################################
 from smtools.misc import super_gauss_function, mundane_gauss_function
@@ -15,9 +15,15 @@ from skimage.transform import probabilistic_hough_line
 from skimage.exposure import equalize_adapthist
 from scipy.signal import find_peaks, savgol_filter
 from scipy.optimize import curve_fit
+from scipy.spatial import distance
+from numpy.linalg import norm
+
+from itertools import combinations
+from sklearn.cluster import KMeans
+from scipy.stats import norm as scinorm
+
 import numpy as np
 import warnings
-
 
 
 def find_rotang(Image, line_length=40,
@@ -25,22 +31,30 @@ def find_rotang(Image, line_length=40,
     """
     Finds the general rotation of an image containing DNA curtains.
     Uses a
-    `Hough line Transform <http://scikit-image.org/docs/dev/api/skimage.transform.html#skimage.transform.probabilistic_hough_line>`_
+    `Hough line Transform
+    <http://scikit-image.org/docs/dev/api/skimage.transform.html
+    #skimage.transform.probabilistic_hough_line>`_
     to approximate DNA locations. Returns the average angle of all
     hough lines.
 
     :param Image: 2D image array
     :param line_length: int, minimum accepted length of line detected
-        by the `Hough line Transform <http://scikit-image.org/docs/dev/api/skimage.transform.html#skimage.transform.probabilistic_hough_line>`_
+        by the `Hough line Transform
+        <http://scikit-image.org/docs/dev/api/skimage.transform.html
+        #skimage.transform.probabilistic_hough_line>`_
         Default is 40.
     :param theta: array, angles at which to compute the
-        `Hough line Transform <http://scikit-image.org/docs/dev/api/skimage.transform.html#skimage.transform.probabilistic_hough_line>`_
+        `Hough line Transform
+        <http://scikit-image.org/docs/dev/api/skimage.transform.html
+        #skimage.transform.probabilistic_hough_line>`_
         in radians. Default is None
     :param line_gap: int, maximum gap between pixels allowed when
         forming a line. default is 5
     :param tilt: int, when theta is None, the tilt value defines the
         range of thetas to be used in the
-        `Hough line Transform <http://scikit-image.org/docs/dev/api/skimage.transform.html#skimage.transform.probabilistic_hough_line>`_
+        `Hough line Transform
+        <http://scikit-image.org/docs/dev/api/skimage.transform.html
+        #skimage.transform.probabilistic_hough_line>`_
         as (pi/2 - tilt:pi/2 + tilt). Defaults to 0.1 radians
 
     :return: measure rotation angle in radians:
@@ -74,28 +88,38 @@ def find_curtain(Image, distance=50, line_length=40,
 
     :param Image: 2D image array
     :param distance: int, passes to
-        `peak_finder <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html>`_.
+        `peak_finder <https://docs.scipy.org/doc/scipy/reference
+        /generated/scipy.signal.find_peaks.html>`_.
         defines minimum spacing between two separate curtains.
         Default is 50.
     :param line_length: int, minimum accepted length of line detected
         by the `Hough line Transform
-        <http://scikit-image.org/docs/dev/api/skimage.transform.html#skimage.transform.probabilistic_hough_line>`_
+        <http://scikit-image.org/docs/dev/api/skimage.transform.html
+        #skimage.transform.probabilistic_hough_line>`_
         Default is 40.
     :param theta: array, angles at which to compute the
-        `Hough line Transform <http://scikit-image.org/docs/dev/api/skimage.transform.html#skimage.transform.probabilistic_hough_line>`_
+        `Hough line Transform
+        <http://scikit-image.org/docs/dev/api/skimage.transform.html
+        #skimage.transform.probabilistic_hough_line>`_
         in radians. Default is None
     :param line_gap: int, maximum gap between pixels allowed when
         forming a line. default is 5
     :param tilt: int, when theta is None, the tilt value defines the
         range of thetas to be used in the
-        `Hough line Transform <http://scikit-image.org/docs/dev/api/skimage.transform.html#skimage.transform.probabilistic_hough_line>`_
+        `Hough line Transform
+        <http://scikit-image.org/docs/dev/api/skimage.transform.html
+        #skimage.transform.probabilistic_hough_line>`_
         as (pi/2 - tilt:pi/2 + tilt). Defaults to 0.1 radians
     :param window: int, window value passed to the
-        `savgol_filter <https://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.signal.savgol_filter.html>`_
+        `savgol_filter <https://docs.scipy.org/doc/scipy-0.15.1
+        /reference/generated/scipy.signal.savgol_filter.html>`_
     :param order: int, order value passed to the
-        `savgol_filter <https://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.signal.savgol_filter.html>`_
+        `savgol_filter <https://docs.scipy.org/doc/scipy-0.15.1
+        /reference/generated/scipy.signal.savgol_filter.html>`_
     :param maxline: int, maximum size line detected by the
-        `Hough line Transform <http://scikit-image.org/docs/dev/api/skimage.transform.html#skimage.transform.probabilistic_hough_line>`_.
+        `Hough line Transform
+        <http://scikit-image.org/docs/dev/api/skimage.transform.html
+        #skimage.transform.probabilistic_hough_line>`_.
         defaults to 70.
 
     :return: List of tuples containing (x_min, x_max, y_min, y_max)
@@ -136,9 +160,9 @@ def find_curtain(Image, distance=50, line_length=40,
     for j in peaks_start:
         for k in peaks_end:
             if (k - j > line_length
-                and k - j < line_length + 20 
-                and smoothed_starts[j] > 1.
-                and smoothed_ends[k] > 1.):
+                    and k - j < line_length + 20
+                    and smoothed_starts[j] > 1.
+                    and smoothed_ends[k] > 1.):
                 curtains.append((j, k))
     d = {key[0]: [] for key in curtains}
     for line in lines:
@@ -173,7 +197,8 @@ def find_DNA(Image, Bounds, prominence=None):
         written to accept output from toolbox.curtains.find_curtain
     :param prominence: passes to
         `peak_finder
-        <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html>`_
+        <https://docs.scipy.org/doc/scipy/reference/generated/scipy
+        .signal.find_peaks.html>`_
         Defaults to (20, 1.5 * max(array)
 
     :return: List of tuples: (top, bottom, and center). Locations of
@@ -212,7 +237,7 @@ def find_DNA(Image, Bounds, prominence=None):
 
 def fit_DNA(Image, locations, constraints=None,
             init_guess_length=None, init_guess_center=None,
-            pad=2, factor=1.3, min_length=45,
+            pad=2, factor=1.3, min_length=45, max_length=56,
             cen_err=.3, cen_dev=3.):
     """
 
@@ -222,17 +247,21 @@ def fit_DNA(Image, locations, constraints=None,
         written to accept output from toolbox.curtains.find_DNA
     :param constraints: 1D list, size 5. bounds on the call to
         curve_fit when fitting toolbox.misc.super_gauss_function. see
-        `bounds <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html>`_
-        Default is ([0, 0, 0, 0, 5.],[np.inf, np.inf, np.inf, np.inf, np.inf]).
+        `bounds <https://docs.scipy.org/doc/scipy/reference/generated
+        /scipy.optimize.curve_fit.html>`_
+        Default is ([0, 0, 0, 0, 5.],[np.inf, np.inf, np.inf, np.inf,
+        np.inf]).
     :param init_guess_length: 1D list, size 5. initial guess for the
         parameters for the call to curve_fit when fitting
         toolbox.misc.super_gauss_function. see
-        `p0 <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html>`_
+        `p0 <https://docs.scipy.org/doc/scipy/reference/generated
+        /scipy.optimize.curve_fit.html>`_
         Default is [.2, 1., np.median(xdata), 20, 6].
     :param init_guess_center: 1D list, size 5. initial guess for the
         parameters for the call to curve_fit when fitting
         toolbox.misc.mundane_gauss_function. see
-        `p0 <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html>`_
+        `p0 <https://docs.scipy.org/doc/scipy/reference/generated
+        /scipy.optimize.curve_fit.html>`_
         Default is [1, 1, 2, 1].
     :param pad: int, number of adjacent rows of pixels to grab for
         the fit, Default is 2 pixels out on each side.
@@ -241,15 +270,19 @@ def fit_DNA(Image, locations, constraints=None,
         maximum - ((maximum - minimum)/factor)
     :param min_length: int, minimum allowed length of DNA.
         Default is 45.
+    :param max_length: int, maximum allowed length of DNA.
+        Default is 56.
     :param cen_err: float, maximum error ratio on the mean for the
         call to
-        `curve_fit <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html>`_
+        `curve_fit <https://docs.scipy.org/doc/scipy/reference
+        /generated/scipy.optimize.curve_fit.html>`_
         when fitting toolbox.misc.mundane_gauss_function.
         Defined as np.sqrt(pcov[2][2])/popt[2]
         Defualts to 0.3.
     :param cen_dev: float, maximum allowed standard deviation for the
         call to
-        `curve_fit <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html>`_
+        `curve_fit <https://docs.scipy.org/doc/scipy/reference
+        /generated/scipy.optimize.curve_fit.html>`_
         when fitting toolbox.misc.mundane_gauss_function.
         Defualts to 3.
 
@@ -308,14 +341,14 @@ def fit_DNA(Image, locations, constraints=None,
                                            len(xdata) * 1000)
                 maximum = max(super_gauss_function(fine_scale_x, *popt))
                 intersection_value = maximum - (
-                            maximum - popt[0]) / factor
+                        maximum - popt[0]) / factor
                 linedata = [intersection_value for x in fine_scale_x]
                 index = np.argwhere(np.diff(np.sign(
                     linedata - super_gauss_function(fine_scale_x,
                                                     *popt)))).flatten()
                 if len(index) == 2:
-                    if fine_scale_x[index[1]] - fine_scale_x[
-                        index[0]] >= min_length:
+                    if min_length <= fine_scale_x[index[1]] - fine_scale_x[
+                        index[0]] <= max_length:
                         top = i[0] + fine_scale_x[index[0]]
                         bottom = i[0] + fine_scale_x[index[1]]
                     else:
@@ -350,142 +383,301 @@ def fit_DNA(Image, locations, constraints=None,
             except RuntimeError:
                 center = None
             if all((top, bottom, center)):
-                output.append((top, bottom, center))
+                output.append(((top, center), (bottom, center)))
     return output
 
 
-class Curtain(object):
-    """
-    Collection into a Curtain .
 
-    Parameters
-    ----------
-    DNA : :obj:`list`
-       Accepts output from `fit DNA`
-    points : :obj:`list` or :obj:`list of tuples`
-       points to apply to DNA
 
-    Example
-    -------
-        >>> import smtools.curtain as cs
-        >>> import smtools.testdata as test
-        >>> from scipy.ndimage.interpolation import rotate
-        >>> im = test.test_curtain()
-        >>> ch1,ch2 = al.im_split(i)
-        >>> angle = cs.find_rotang(ch2)
-        >>> rotated_ch2 = rotate(ch2,angle)
-        >>> bounds, mask = cs.find_curtain(rotated_ch2)
-        >>> strands = cs.find_DNA(rotated_ch2,bounds)
-        >>> DNAs = cs.fit_DNA(rotated_ch2, strands)
-        >>> strands = Curtain(DNAs)
-        >>> strands.assign_points(test.test_points())
-        >>> data = strands.get_DNA()
-        >>> print(data)
-    """
+class DNA(object):
 
-    def __init__(self, DNA):
+    def __init__(self, params, id):
         """
-        :param DNA: Accepts list directly from `fit_curtains`
+        :param params:
         """
-        self.DNA = DNA
-        self.DNA_dictionary()
 
-        self.minimum_length = 4
+        self.id = id
 
-    def DNA_dictionary(self):
-        self.DNA_dictionary = {}
-        for i in self.DNA:
-            self.DNA_dictionary[i] = []
+        self.params = params
 
-    def add_point(self, key, point):
-        """
-        :param key: keys to DNA_dictionary
-        :param point: (x,y)
-        """
-        self.DNA_dictionary[key].append(point)
+        self.top = np.array(self.params[0])
+        self.bottom = np.array(self.params[1])
+        self.extension = norm(self.bottom - self.top)
 
-    def assign_points(self, points, frame=None,
-                      pad=5, max_offset=1):
-        """
-        :param points: 1D list of (x,y) points
-        :param frame: frame number if data are from image stack
-        :param pad: additional extension to length of DNA applied to
-            top and bottom position when assigning points.
-        :param max_offset: maximum distance from center of DNA strand
-            that still allows a point to be assigned to it.
-        """
-        for x, y in points:
-            for each in self.DNA_dictionary:
-                if (x > each[0] and x < each[1] + pad
-                        and y > each[2] - max_offset
-                        and y < each[2] + max_offset):
-                    if frame is None:
-                        self.DNA_dictionary[each].append((x, y))
-                    else:
-                        self.DNA_dictionary[each].append((x, y, frame))
+        self.assigned_points = []
+        self.pixels_from_end = []
+        self.scaled_points = []
 
+        self.points_targets = []
+        self.strand_extension = []
+        self.points_pairwise = []
+        self.pairs_used = []
 
-    def assign_point_stack(self, points_list,
-                           pad=5, max_offset=1):
+    def assign_points(self, points, max_offset=1):
         """
-        :param points_list: list of 1D lists of (x,y) points
-        :param pad: additional extension to length of DNA applied to
-            top and bottom position when assigning points.
-        :param max_offset: max_offset: maximum distance from center of DNA strand
-            that still allows a point to be assigned to it.
+
+        :param points:
+        :param max_offset:
+        :return:
         """
-        frame = 0
-        for i in points_list:
-            self.assign_points(i, frame, pad, max_offset)
-            frame += 1
+        for x, y, t in points:
+            d = np.cross(self.bottom - self.top, self.top - np.array(
+                (x, y))) / self.extension
+            if (self.top[0] <= x <= self.bottom[0] and max_offset >=
+                    abs(d)):
+                self.assigned_points.append((x, y, t))
+
+    def distance_from_end(self):
+        """
+
+        :return:
+        """
+        for x, y, t in self.assigned_points:
+            d1 = norm(self.bottom - np.array((x, y)))
+            d2 = np.cross(self.bottom - self.top,
+                          self.top - np.array((x, y))) / self.extension
+            x_FromEnd = np.sqrt((d1 ** 2) - (d2 ** 2))
+            self.pixels_from_end.append((x_FromEnd, y, t))
+
+    def scale_to_bp(self, length=48502):
+        """
+
+        :param length:
+        :return:
+        """
+        for x, y, t in self.assigned_points:
+            d1 = norm(np.array((x, y)) - self.top)
+            d2 = np.cross(self.bottom - self.top,
+                          self.top - np.array((x, y))) / self.extension
+            d3 = np.sqrt((d1 ** 2) - (d2 ** 2))
+            scaled_x = d3 / self.extension * length
+            self.scaled_points.append((scaled_x, y, t))
+
+    def binding_count(self):
+        """
+
+        :return:
+        """
+        return len(self.assigned_points)
+
+    def binding_data(self):
+        """
+
+        :return:
+        """
+        if len(self.pixels_from_end):
+            return [i[0] for i in self.pixels_from_end]
+        elif len(self.scaled_points):
+            return [i[0] for i in self.scaled_points]
+        elif len(self.assigned_points):
+            return [i[0] for i in self.assigned_points]
+        else:
+            return None
+
+    def pair_with_target(self, pop_params):
+        for x, y, t in self.pixels_from_end:
+            match = min(pop_params, key = lambda stat: abs(stat[0] - x))
+            pixelmean = match[0]
+            pixelstdev = match [1]
+            bptarget = match[2]
+            if x > (pixelmean + abs(1*pixelstdev)) or x < (pixelmean - abs(1*pixelstdev)):
+                pass
+            else:
+                self.points_targets.append((x, bptarget))
+
+    def matched_events(self):
+        if len(self.points_targets):
+            return [x for x in self.points_targets]
+        else:
+            return None
+
+    def remove_population(self, target, max_target):
+        for each in self.points_targets:
+            if each[1] == target:
+                self.points_targets.remove(each)
+            elif each[1] > max_target:
+                self.points_targets.remove(each)
+            else:
+                pass
+
+    def position_pairwise(self, excluded1):
+        if len(self.points_targets) > 2:
+            pairs = [each for each in combinations(self.points_targets, 2)]
+            for twoevents in pairs:
+                if twoevents[0] > twoevents[1]:
+                    event1 = twoevents[0]
+                    event2 = twoevents[1]
+                else:
+                    event1 = twoevents[1]
+                    event2 = twoevents[0]
+                if event1[1] == event2[1]:
+                    pass
+                elif event1[1] == excluded1 or event2[1] == excluded1:
+                    pass
+                else:
+                    barcode = (event1[1] + event2[1])
+                    pixel_distance = abs(event1[0] - event2[0])
+                    basepair_distance = abs(event1[1] - event2[1])
+                    extension = basepair_distance / pixel_distance
+                    self.strand_extension.append((event1[1], event2[1], barcode,
+                                                  pixel_distance, basepair_distance, extension))
+                    for x, bptarget in self.points_targets:
+                        if x == event1[0] or x == event2[0]:
+                            pass
+                        else:
+                            relative_distance = abs(x - event1[0])
+                            basepair_difference = relative_distance * extension
+                            if x > event1[0]:
+                                measured_position = event1[1] - basepair_difference
+                                self.points_pairwise.append((x, bptarget, measured_position,
+                                                             twoevents, barcode))
+                            else:
+                                measured_position = event1[1] + basepair_difference
+                                self.points_pairwise.append((x, bptarget, measured_position,
+                                                             twoevents, barcode))
+
+    def filtered_pairwise(self, pair_params, excluded1, excluded2):
+        if len(self.points_targets) > 2:
+            pairs = [each for each in combinations(self.points_targets, 2)]
+            for twoevents in pairs:
+                if twoevents[0] > twoevents[1]:
+                    event1 = twoevents[0]
+                    event2 = twoevents[1]
+                else:
+                    event1 = twoevents[1]
+                    event2 = twoevents[0]
+                if event1[1] == event2[1]:
+                    pass
+                elif event1[1] == excluded1 or event2[1] == excluded1:
+                    pass
+                elif event1[1] == excluded2 or event2[1] == excluded2:
+                    pass
+                else:
+                    barcode = (event1[1] + event2[1])
+                    for stats in pair_params:
+                        if barcode == stats[0]:
+                            pixel_distance = abs(event1[0] - event2[0])
+                            basepair_distance = abs(event1[1] - event2[1])
+                            extension = basepair_distance / pixel_distance
+                            if extension > stats[1] + 1*(abs(stats[2])) or extension < stats[1] - 1*(abs(stats[2])):
+                                pass
+                            else:
+                                self.strand_extension.append((event1[1], event2[1], barcode,
+                                                              pixel_distance, basepair_distance, extension))
+                                for x, bptarget in self.points_targets:
+                                    if x == event1[0] or x == event2[0]:
+                                        pass
+                                    else:
+                                        relative_distance = abs(x - event1[0])
+                                        basepair_difference = relative_distance * extension
+                                        if x > event1[0]:
+                                            measured_position = event1[1] - basepair_difference
+                                            calc_error = measured_position - bptarget
+                                            self.points_pairwise.append((x, bptarget, measured_position,
+                                                                         relative_distance, calc_error,
+                                                                         twoevents, barcode))
+                                        else:
+                                            measured_position = event1[1] + basepair_difference
+                                            calc_error = measured_position - bptarget
+                                            self.points_pairwise.append((x, bptarget, measured_position,
+                                                                         relative_distance, calc_error,
+                                                                         twoevents, barcode))
+                        else:
+                            pass
+
+    def filtered_flanking(self, pair_params, excluded1):
+        if len(self.points_targets) > 2:
+            pairs = [each for each in combinations(self.points_targets, 2)]
+            for twoevents in pairs:
+                if twoevents[0] > twoevents[1]:
+                    event1 = twoevents[0]
+                    event2 = twoevents[1]
+                else:
+                    event1 = twoevents[1]
+                    event2 = twoevents[0]
+                if event1[1] == event2[1]:
+                    pass
+                elif event1[1] == excluded1 or event2[1] == excluded1:
+                    pass
+                else:
+                    barcode = (event1[1] + event2[1])
+                    for stats in pair_params:
+                        if barcode == stats[0]:
+                            pixel_distance = abs(event1[0] - event2[0])
+                            basepair_distance = abs(event1[1] - event2[1])
+                            extension = basepair_distance / pixel_distance
+                            if extension > stats[1] + 1*(abs(stats[2])) or extension < stats[1] - 1*(abs(stats[2])):
+                                pass
+                            else:
+                                for x, bptarget in self.points_targets:
+                                    if x == event1[0] or x == event2[0]:
+                                        pass
+                                    if event1[0] < x < event2[0] or event2[0] < x < event1[0]:
+                                        relative_distance = abs(x - event1[0])
+                                        basepair_difference = relative_distance * extension
+                                        if x > event1[0]:
+                                            measured_position = event1[1] - basepair_difference
+                                            calc_error = measured_position - bptarget
+                                            self.points_pairwise.append((x, bptarget, measured_position,
+                                                                         relative_distance, calc_error,
+                                                                         twoevents, barcode))
+                                        else:
+                                            measured_position = event1[1] + basepair_difference
+                                            calc_error = measured_position - bptarget
+                                            self.points_pairwise.append((x, bptarget, measured_position,
+                                                                         relative_distance, calc_error,
+                                                                         twoevents, barcode))
+                                    else:
+                                        pass
+                        else:
+                            pass
+
+    def pair_check(self, excluded1, excluded2):
+        if len(self.points_targets) > 2:
+            pairs = [each for each in combinations(self.points_targets, 2)]
+            for twoevents in pairs:
+                event1 = twoevents[0]
+                event2 = twoevents[1]
+                if event1[1] == event2[1]:
+                    pass
+                elif event1[1] == excluded1 or event2[1] == excluded1:
+                    pass
+                elif event1[1] == excluded2 or event2[1] == excluded2:
+                    pass
+                else:
+                    self.pairs_used.append(twoevents)
+
+    def pairs_list(self):
+        if (len(self.pairs_used)):
+            return [i for i in self.pairs_used]
+        else:
+            return None
+
+    def strand_parameters(self):
+        if (len(self.strand_extension)):
+            return [i for i in self.strand_extension]
+        else:
+            return None
+
+    def calculated_position(self):
+        if(len(self.points_pairwise)):
+            return[i for i in self.points_pairwise]
+        else:
+            return None
 
     def pairwise(self):
         """
 
         :return:
         """
-        spacing = []
-        for i in self.DNA_dictionary:
-            if len(self.DNA_dictionary[i]) > 1:
-                positions = [x for x, y in self.DNA_dictionary[i]]
-                for pair in combinations(positions, 2):
-                    print(abs(pair[0] - pair[1]))
-                    spacing.append(abs(pair[0] - pair[1]))
-        return spacing
-
-
-    def per_strand_counts(self):
-        """
-
-        :return:
-        """
-        counts = []
-        for i in self.DNA_dictionary:
-            counts.append(len(self.DNA_dictionary[i]))
-        return counts
-
-
-    def get_DNA(self):
-        """
-        :return: dict, Keys are (top, bottom, center) for each DNA
-            strand. Entries are lists of points (x, y) or (x, y, frame)
-        """
-        return (self.DNA_dictionary)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        if len(self.scaled_points) > 1:
+            arr = np.array(self.scaled_points)
+            unique = np.unique(distance.cdist(arr[:, :1], arr[:, :1],
+                                              'euclidean'))
+            return unique.tolist()
+        elif len(self.assigned_points) > 1:
+            print("WARNING: Pairwise calculated from unscaled data")
+            arr = np.array(self.assigned_points)
+            unique = np.unique(distance.cdist(arr[:, :2], arr[:, :2],
+                                              'euclidean'))
+            return unique.tolist()
